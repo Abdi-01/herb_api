@@ -1,6 +1,7 @@
 const { db } = require("../database/index");
 const Crypto = require("crypto");
 const { createToken } = require("../helper/createToken");
+const transporter = require("../helper/nodemailer");
 
 module.exports = {
   getUser: (req, res) => {
@@ -67,6 +68,100 @@ module.exports = {
       let dataToString = JSON.stringify(result);
       let dataResult = JSON.parse(dataToString);
       res.status(200).send(dataResult[0]);
+    });
+  },
+  addUser: (req, res) => {
+    let { username, email, password } = req.body;
+
+    let getQuery = `select * from users where username=${db.escape(
+      username
+    )} or email = ${db.escape(email)}`;
+
+    db.query(getQuery, (error, results) => {
+      if (error) throw error;
+      if (results.length > 0) {
+        res.send({
+          message: "Username or Email is already exists",
+        });
+      } else {
+        // Hash the password
+        password = Crypto.createHmac("sha1", "hash123")
+          .update(password)
+          .digest("hex");
+
+        // Insert to database
+        let insertQuery = `insert into users values (null, ${db.escape(
+          username
+        )}, ${db.escape(email)},${db.escape(
+          password
+        )},'user','unverified', null,null,null,null,null,null)`;
+
+        // Post the DATA
+
+        db.query(insertQuery, (err, result) => {
+          if (err) {
+            res.status(500).send(err);
+          }
+          if (result.insertId) {
+            let getUserQuery = `select * from users where id = ${result.insertId}`;
+
+            db.query(getUserQuery, (err2, result2) => {
+              if (err2) {
+                console.log(err2);
+              }
+              // Parse the result data format from mysql
+              let dataToString = JSON.stringify(result2);
+              let dataResult = JSON.parse(dataToString);
+              let { id, username, email, role, user_status } = dataResult[0];
+              // Create Token
+              let dataToken = { id, username, email, role, user_status };
+              let token = createToken(dataToken);
+
+              res.status(200).send({ dataLogin: dataResult, token: token });
+
+              // Email Verify
+
+              // Email Verification Format
+              let mail = {
+                from: `Admin <herb.iostores@gmail.com>`,
+                // Email orang yg ada di database
+                to: `${email}`,
+                subject: "Herbio Account Verification",
+                // Isi Emailnya
+                html: `<a href='http://localhost:3000/verify/${token}'>Click here to verify your account</a>`,
+              };
+
+              // Sending verification link to email
+              transporter.sendMail(mail, (errMail, resMail) => {
+                if (errMail) {
+                  res.status(500).send({
+                    message: "Registration Failed",
+                    isSuccess: false,
+                    err: errMail,
+                  });
+                }
+                res.status(200).send({
+                  message: `Registration Success, now verify your account by check your email to ${email}`,
+                  isSuccess: true,
+                });
+              });
+            });
+          }
+        });
+      }
+    });
+  },
+  verification: (req, res) => {
+    let { id, username } = req.user;
+    let updateQuery = `UPDATE users set user_status='verified' where id = ${id}`;
+    db.query(updateQuery, (err, results) => {
+      if (err) {
+        res.status(500).send(err);
+      }
+      res.status(200).send({
+        message: `${username} is successfully verified`,
+        isSuccess: true,
+      });
     });
   },
 };
