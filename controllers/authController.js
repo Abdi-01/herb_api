@@ -31,8 +31,7 @@ module.exports = {
       if (dataResult.length) {
         if (dataResult[0].user_status != "verified") {
           res.status(200).send({
-            message:
-              "Your account has not been verified yet, please verify by open your email to get verification link",
+            message: "Your account has not been verified yet",
           });
         } else {
           let { id, username, email, role, user_status } = dataResult[0];
@@ -163,5 +162,72 @@ module.exports = {
         isSuccess: true,
       });
     });
+  },
+  forgotPassword: (req, res) => {
+    let { account } = req.query;
+
+    let getUser = `select * from users where username = ${db.escape(
+      account
+    )} or email = ${db.escape(account)}`;
+    db.query(getUser, (err, result) => {
+      if (err) {
+        res.status(500).send(err);
+      }
+      if (result.length) {
+        let dataToString = JSON.stringify(result);
+        let dataResult = JSON.parse(dataToString);
+        let { id, username, email, role, user_status } = dataResult[0];
+        let dataToken = { id, username, email, role, user_status };
+        let token = createToken(dataToken);
+        res.status(200).send({ dataLogin: dataResult, token: token });
+
+        // Reset password link
+        let mail = {
+          from: `Admin <herb.iostores@gmail.com>`,
+          // Email orang yg ada di database
+          to: `${email}`,
+          subject: "Herbio Reset Account Link",
+          // Isi Emailnya
+          html: `<a href='http://localhost:3000/forgot/verify/${token}'>Click here to reset your password account</a>`,
+        };
+
+        // Sending verification link to email
+        transporter.sendMail(mail, (errMail, resMail) => {
+          if (errMail) {
+            res.status(500).send({
+              message: "Registration Failed",
+              isSuccess: false,
+              err: errMail,
+            });
+          }
+          res.status(200).send({});
+        });
+      } else {
+        res.status(200).send({
+          message: "Account does not exists",
+        });
+      }
+    });
+  },
+  resetPassword: (req, res) => {
+    let { id } = req.user;
+    let { password } = req.body;
+    // Hash the password
+    password = Crypto.createHmac("sha1", "hash123")
+      .update(password)
+      .digest("hex");
+
+    let updateQuery = `UPDATE users set password=${db.escape(
+      password
+    )} where id = ${id}`;
+    db.query(updateQuery, (err, results) => {
+      if (err) {
+        res.status(500).send(err);
+      }
+      res.status(200).send({});
+    });
+  },
+  changePassword: (req, res) => {
+    res.send(req.body);
   },
 };
