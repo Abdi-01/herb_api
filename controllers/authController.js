@@ -228,6 +228,23 @@ module.exports = {
     });
   },
   changePassword: (req, res) => {
-    res.send(req.body);
+    let { id, password } = req.body;
+
+    // Hash the password
+    password = Crypto.createHmac("sha1", "hash123")
+      .update(password)
+      .digest("hex");
+
+    let updatePassword = `update users set password=${db.escape(
+      password
+    )} where id = ${id}`;
+
+    db.query(updatePassword, (err, results) => {
+      if (err) {
+        res.sendStatus(500);
+      }
+
+      res.send(results);
+    });
   },
 };
