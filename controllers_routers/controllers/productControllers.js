@@ -61,4 +61,65 @@ module.exports = {
       res.status(500).send(error);
     }
   },
+  updateData: (req, res) => {
+    try {
+      let path = '/images/products';
+      const upload = uploader(path, 'PRD').fields([{ name: 'file' }]);
+
+      upload(req, res, (error) => {
+        // if error
+        if (error) {
+          console.log(error);
+          res.status(500).send(error);
+        }
+
+        if (req.files) {
+          const { file } = req.files;
+          const filepath = file ? path + '/' + file[0].filename : null;
+
+          let data = JSON.parse(req.body.data);
+          data.product_img = filepath;
+
+          let dataUpdate = [];
+
+          for (let prop in data) {
+            dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
+          }
+
+          let updateDataQuery = `UPDATE sys.products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
+
+          db.query(updateDataQuery, (err, results) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send(err);
+              fs.unlinkSync('./public' + filepath);
+            }
+            res
+              .status(200)
+              .send({ message: 'Item has succefully been updated' });
+          });
+        } else if (!req.files) {
+          let data = req.body;
+          let dataUpdate = [];
+
+          for (let prop in data) {
+            dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
+          }
+
+          let updateDataQuery = `UPDATE sys.products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
+
+          db.query(updateDataQuery, (err, results) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send(err);
+            }
+            res.status(200).send({ message: 'Succesfully updated item' });
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(err);
+    }
+  },
 };
