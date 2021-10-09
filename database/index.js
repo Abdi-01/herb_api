@@ -16,9 +16,9 @@ const db = mysql.createPool({
 
 db.getConnection((err) => {
   if (err) {
-    return console.error(`Error : ${err.message}`);
+    return console.error(err);
   }
-  console.log(`Connected to MYSQL Server`);
+  console.log('Established connection with db_herb mySQL server.');
 });
 
 module.exports = { db };
