@@ -122,4 +122,12 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  deleteData: (req, res) => {
+    let deleteDataQuery = `DELETE FROM sys.products WHERE product_id = ${req.params.product_id}`;
+
+    db.query(deleteDataQuery, (err, results) => {
+      if (err) res.status(500).send(err);
+      res.status(200).send(results);
+    });
+  },
 };
