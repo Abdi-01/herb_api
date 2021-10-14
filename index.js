@@ -9,18 +9,19 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static("public"));
 app.use(bearerToken());
 
 app.get("/", (req, res) => {
-  res.status(200).send('<h4>Welcome to herb_api</h4>');
+  res.status(200).send("<h4>Welcome to herb_api</h4>");
 });
 
 // Routes
-const { authRouters } = require("./routes");
-const { productRouters } = require('./controllers_routers/routers');
+const { authRouters, cartRouters } = require("./routes");
+const { productRouters } = require("./controllers_routers/routers");
 
 app.use("/auth", authRouters);
-app.use('/products', productRouters);
+app.use("/products", productRouters);
+app.use("/carts", cartRouters);
 
 app.listen(PORT, () => console.log("Api Running :", PORT));

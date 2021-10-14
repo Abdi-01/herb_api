@@ -4,6 +4,7 @@ const { createToken } = require("../helper/createToken");
 const transporter = require("../helper/nodemailer");
 
 module.exports = {
+  // loginUser : (user,password,res)
   getUser: (req, res) => {
     let { account, password } = req.query;
 
