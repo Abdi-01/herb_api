@@ -1,9 +1,22 @@
-const { db } = require('../../database/index');
+const { db } = require('../database/index');
 
-const { uploader } = require('../../helper/uploader');
+const { uploader } = require('../helper/uploader');
 const fs = require('fs');
 
 module.exports = {
+  getData: (req, res) => {
+    let getDataQuery = `SELECT * FROM sys.products p
+      LEFT JOIN sys.brands b ON p.brand_id = b.brand_id
+      LEFT JOIN sys.categories c ON p.category_id = c.category_id WHERE product_id = ${req.params.product_id} `;
+
+    db.query(getDataQuery, (err, results) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send(err);
+      }
+      res.status(200).send(results);
+    });
+  },
   getAllProductData: (req, res) => {
     let getAllProductsQuery = `SELECT * FROM sys.products p
       LEFT JOIN sys.brands b ON p.brand_id = b.brand_id
