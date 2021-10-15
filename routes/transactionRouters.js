@@ -1,8 +1,22 @@
-const express = require("express");
-const router = express.Router();
-const { transactionController } = require("../controllers");
+const { transactionControllers } = require("../controllers");
 
-// Add Transaction
-router.post("/", transactionController.addTransaction);
+const routers = require("express").Router();
 
-module.exports = router;
+// get particular data
+routers.get("/get/:transaction_id", transactionControllers.getTransactionData);
+// get all data
+routers.get("/get", transactionControllers.getAllTransactionData);
+// add new transaction data
+routers.post("/post", transactionControllers.addNewTransactionData);
+// update transaction data
+routers.patch(
+  "/update/:transaction_id",
+  transactionControllers.updateTransactionData
+);
+// delete transaction data
+routers.delete(
+  "/delete/:transaction_id",
+  transactionControllers.deleteTransactionData
+);
+
+module.exports = routers;
