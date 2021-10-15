@@ -17,16 +17,16 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-const { authRouters, cartRouters, transactionRouters } = require("./routes");
-const { productRouters } = require("./controllers_routers/routers");
-const { authRouters, cartRouters } = require("./routes");
+const { authRouters, cartRouters, transactionRouter } = require("./routes");
 const { productRouters } = require("./routes");
 const { transactionRouters } = require("./routes");
 
 app.use("/auth", authRouters);
 app.use("/products", productRouters);
-app.use("/transaction", transactionRouters);
 app.use("/carts", cartRouters);
-app.use("/transactions", transactionRouters);
+// Custom Trans
+app.use("/transaction", transactionRouters);
+// Regular Trans
+app.use("/transactions", transactionRouter);
 
 app.listen(PORT, () => console.log("Api Running :", PORT));

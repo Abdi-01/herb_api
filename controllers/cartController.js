@@ -1,16 +1,27 @@
 const { db } = require("../database/index");
 
 module.exports = {
-  getCart: (req, res) => {
-    // console.log(req.session);
-
-    let getCartQuery = `select * from carts inner join products on carts.product_id = products.product_id where carts.user_id = ${db.escape(
+  getAllCart: (req, res) => {
+    let getAllCartQuery = `select * from carts inner join products on carts.product_id = products.product_id where carts.user_id = ${db.escape(
       req.session.id
     )} `;
-    db.query(getCartQuery, (err, result) => {
+    db.query(getAllCartQuery, (err, result) => {
       let dataToString = JSON.stringify(result);
       let dataResult = JSON.parse(dataToString);
-      // console.log(dataResult);
+      res.send(dataResult);
+    });
+  },
+  getCart: (req, res) => {
+    let { userId, productId } = req.query;
+    let getCartQuery = `select * from carts where user_id = ${db.escape(
+      userId
+    )} and product_id = ${db.escape(productId)}`;
+    db.query(getCartQuery, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      let dataToString = JSON.stringify(result);
+      let dataResult = JSON.parse(dataToString);
       res.send(dataResult);
     });
   },
@@ -36,10 +47,22 @@ module.exports = {
   },
   deleteCart: (req, res) => {
     let { id } = req.params;
-    console.log(id);
-    let deleteCartQuery = `delete from carts where id = ${db.escape(id)}`;
+    let deleteCartQuery = `delete from carts where user_id = ${db.escape(id)}`;
 
     db.query(deleteCartQuery, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      res.sendStatus(200);
+    });
+  },
+  addCart: (req, res) => {
+    let { userId, quantity, productId } = req.body;
+    let addCartQuery = `insert into carts values (null, ${db.escape(
+      userId
+    )},${db.escape(quantity)},${db.escape(productId)})`;
+
+    db.query(addCartQuery, (err, result) => {
       if (err) {
         console.log(err);
       }
