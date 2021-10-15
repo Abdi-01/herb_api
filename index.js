@@ -17,11 +17,12 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-const { authRouters, cartRouters } = require("./routes");
+const { authRouters, cartRouters, transactionRouters } = require("./routes");
 const { productRouters } = require("./controllers_routers/routers");
 
 app.use("/auth", authRouters);
 app.use("/products", productRouters);
 app.use("/carts", cartRouters);
+app.use("/transactions", transactionRouters);
 
 app.listen(PORT, () => console.log("Api Running :", PORT));

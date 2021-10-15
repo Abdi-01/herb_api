@@ -7,6 +7,9 @@ const router = express.Router();
 router.get("/", authorize, cartController.getCart);
 
 // Update Qty Cart
-router.patch("/update-cart", cartController.updateQty);
+router.patch("/:id", cartController.updateQty);
+
+// Delete Specific Cart
+router.delete("/:id", cartController.deleteCart);
 
 module.exports = router;

@@ -4,26 +4,25 @@ module.exports = {
   getCart: (req, res) => {
     // console.log(req.session);
 
-    let getQuery = `Select * from carts INNER JOIN cart_details on carts.id = cart_details.id INNER JOIN products on cart_details.product_id = products.product_id where carts.user_id = ${db.escape(
+    let getCartQuery = `select * from carts inner join products on carts.product_id = products.product_id where carts.user_id = ${db.escape(
       req.session.id
-    )}
-    `;
-    db.query(getQuery, (err, result) => {
+    )} `;
+    db.query(getCartQuery, (err, result) => {
       let dataToString = JSON.stringify(result);
       let dataResult = JSON.parse(dataToString);
-      //   console.log(dataResult);
+      // console.log(dataResult);
       res.send(dataResult);
     });
   },
   updateQty: (req, res) => {
-    let { id, qty, action } = req.body;
+    let { qty, action } = req.body;
+    let { id } = req.params;
     if (action === "increment") {
       qty += 1;
     }
-    if (action === "decrement") {
+    if (action === "decrement" && qty > 1) {
       qty -= 1;
     }
-    console.log(qty);
     let updateQtyCart = `update carts set quantity = ${db.escape(
       qty
     )} where id = ${db.escape(id)}`;
@@ -32,7 +31,19 @@ module.exports = {
       if (err) {
         console.log(err);
       }
-      res.send(true);
+      res.sendStatus(200);
+    });
+  },
+  deleteCart: (req, res) => {
+    let { id } = req.params;
+    console.log(id);
+    let deleteCartQuery = `delete from carts where id = ${db.escape(id)}`;
+
+    db.query(deleteCartQuery, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      res.sendStatus(200);
     });
   },
 };
