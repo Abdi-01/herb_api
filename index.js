@@ -9,7 +9,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.static("public"));
 app.use(bearerToken());
 
 app.get('/', (req, res) => {
@@ -17,12 +17,13 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-const { authRouters } = require('./routes');
+const { authRouters, cartRouters } = require("./routes");
 const { productRouters } = require('./routes');
 const { transactionRouters } = require('./routes');
 
 app.use('/auth', authRouters);
 app.use('/products', productRouters);
 app.use('/transaction', transactionRouters);
+app.use("/carts", cartRouters);
 
 app.listen(PORT, () => console.log('Api Running :', PORT));
