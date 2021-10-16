@@ -3,10 +3,18 @@ const { cartController } = require("../controllers");
 const { authorize } = require("../helper/authToken");
 const router = express.Router();
 
-// Get Carts
-router.get("/", authorize, cartController.getCart);
+// Get All Carts
+router.get("/", authorize, cartController.getAllCart);
+
+// Get Specific Carts
+router.get("/:id", cartController.getCart);
+
+router.post("/", cartController.addCart);
 
 // Update Qty Cart
-router.patch("/update-cart", cartController.updateQty);
+router.patch("/:id", cartController.updateQty);
+
+// Delete Specific Cart
+router.delete("/:id", cartController.deleteCart);
 
 module.exports = router;

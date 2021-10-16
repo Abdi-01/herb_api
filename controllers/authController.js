@@ -5,7 +5,7 @@ const transporter = require("../helper/nodemailer");
 
 module.exports = {
   // loginUser : (user,password,res)
-  getUser: (req, res) => {
+  onLogin: (req, res) => {
     let { account, password } = req.query;
 
     // Hash the password
@@ -30,22 +30,16 @@ module.exports = {
       let dataToString = JSON.stringify(result);
       let dataResult = JSON.parse(dataToString);
       if (dataResult.length) {
-        if (dataResult[0].user_status != "verified") {
-          res.status(200).send({
-            message: "Your account has not been verified yet",
-          });
-        } else {
-          let { id, username, email, role, user_status } = dataResult[0];
-          let dataToken = {
-            id,
-            username,
-            email,
-            role,
-            user_status,
-          };
-          let token = createToken(dataToken);
-          res.status(200).send({ dataLogin: dataResult, token: token });
-        }
+        let { id, username, email, role, user_status } = dataResult[0];
+        let dataToken = {
+          id,
+          username,
+          email,
+          role,
+          user_status,
+        };
+        let token = createToken(dataToken);
+        res.status(200).send({ dataLogin: dataResult, token: token });
       } else {
         res.status(200).send({
           message: "Incorrect username or password",
