@@ -5,7 +5,22 @@ module.exports = {
     let { id } = req.session;
     let getTransactionQuery = `select * from transactions where user_id = ${db.escape(
       id
-    )}`;
+    )} and payment_status = "unpaid"`;
+
+    db.query(getTransactionQuery, (err, result) => {
+      let dataToString = JSON.stringify(result);
+      let dataResult = JSON.parse(dataToString);
+      if (err) {
+        console.log(err);
+      }
+      res.status(200).send(dataResult);
+    });
+  },
+  getTransactionHistory: (req, res) => {
+    let { id } = req.session;
+    let getTransactionQuery = `select * from transactions where user_id = ${db.escape(
+      id
+    )} and payment_status = "paid"`;
 
     db.query(getTransactionQuery, (err, result) => {
       let dataToString = JSON.stringify(result);
@@ -60,5 +75,67 @@ module.exports = {
         }
       }
     });
+  },
+  updateTransactionProof: (req, res) => {
+    try {
+      let path = "/images/transaction";
+
+      const upload = uploader(path, "TRF").fields([{ name: "file" }]);
+
+      upload(req, res, (error) => {
+        // if error
+        if (error) {
+          console.log(error);
+          res.status(500).send(error);
+        }
+
+        if (req.files) {
+          const { file } = req.files;
+          const filepath = file ? path + "/" + file[0].filename : null;
+
+          let data = JSON.parse(req.body.data);
+          data.product_img = filepath;
+
+          let dataUpdate = [];
+
+          for (let prop in data) {
+            dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
+          }
+
+          let updateTransactionDataQuery = `UPDATE transactions SET ${dataUpdate} WHERE transaction_id = ${req.params.transaction_id};`;
+
+          db.query(updateTransactionDataQuery, (err, results) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send(err);
+              fs.unlinkSync("./public" + filepath);
+            }
+            res
+              .status(200)
+              .send({ message: "Item has succefully been updated" });
+          });
+        } else if (!req.files) {
+          let data = req.body;
+          let dataUpdate = [];
+
+          for (let prop in data) {
+            dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
+          }
+
+          let updateTransactionDataQuery = `UPDATE sys.transaction SET ${dataUpdate} WHERE transaction_id = ${req.params.transaction_id};`;
+
+          db.query(updateTransactionDataQuery, (err, results) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send(err);
+            }
+            res.status(200).send({ message: "Succesfully updated item" });
+          });
+        }
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(err);
+    }
   },
 };
