@@ -6,12 +6,12 @@ const db = mysql.createPool({
   connectTimeout: 60 * 60 * 1000,
   acquireTimeout: 60 * 60 * 1000,
   timeout: 60 * 60 * 1000,
-  host: `103.166.156.201`,
-  user: "dev",
-  password: "password",
-  database: "db_herb",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
   port: 3306,
-  multipleStatements: true,
+  multipleStatements: true
 });
 
 db.getConnection((err) => {

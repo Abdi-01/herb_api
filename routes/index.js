@@ -3,6 +3,7 @@ const productRouters = require("./productRouters");
 const transactionRouters = require("./transactionRouters");
 const cartRouters = require("./cartRouters");
 const transactionRouter = require("./transactionsRouter");
+const userRouter = require("./userRouter");
 
 module.exports = {
   authRouters,
@@ -10,4 +11,5 @@ module.exports = {
   transactionRouters,
   cartRouters,
   transactionRouter,
+  userRouter
 };
