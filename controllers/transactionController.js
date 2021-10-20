@@ -7,7 +7,7 @@ module.exports = {
     let { id } = req.session;
     let getTransactionQuery = `select * from transactions where user_id = ${db.escape(
       id
-    )} and payment_status = "unpaid"`;
+    )} and payment_status = "unpaid" or payment_status = "onprocess" `;
 
     db.query(getTransactionQuery, (err, result) => {
       let dataToString = JSON.stringify(result);
@@ -115,7 +115,7 @@ module.exports = {
 
         let sql = `update transactions set notes_payment = ${db.escape(
           data.notesPayment
-        )}, payment_proof = ${db.escape(
+        )}, payment_status = "onprocess", payment_proof = ${db.escape(
           filePath
         )} where transaction_id = ${db.escape(req.params.transaction_id)}`;
 
