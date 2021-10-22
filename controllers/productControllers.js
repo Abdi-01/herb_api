@@ -5,7 +5,7 @@ const fs = require('fs');
 
 module.exports = {
   getData: (req, res) => {
-    let getDataQuery = `SELECT * FROM sys.products p
+    let getDataQuery = `SELECT * FROM products p
       LEFT JOIN sys.brands b ON p.brand_id = b.brand_id
       LEFT JOIN sys.categories c ON p.category_id = c.category_id WHERE product_id = ${req.params.product_id} `;
 
@@ -18,7 +18,7 @@ module.exports = {
     });
   },
   getAllProductData: (req, res) => {
-    let getAllProductsQuery = `SELECT * FROM sys.products p
+    let getAllProductsQuery = `SELECT * FROM products p
       LEFT JOIN sys.brands b ON p.brand_id = b.brand_id
       LEFT JOIN sys.categories c ON p.category_id = c.category_id;`;
     // checking
@@ -46,7 +46,7 @@ module.exports = {
         let data = JSON.parse(req.body.data);
         data.product_img = filepath;
 
-        let addNewDataQuery = `INSERT INTO sys.products VALUES (null, ${db.escape(
+        let addNewDataQuery = `INSERT INTO products VALUES (null, ${db.escape(
           data.product_name
         )}, ${db.escape(data.product_desc)}, ${db.escape(
           filepath
@@ -99,7 +99,7 @@ module.exports = {
             dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
           }
 
-          let updateDataQuery = `UPDATE sys.products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
+          let updateDataQuery = `UPDATE products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
 
           db.query(updateDataQuery, (err, results) => {
             if (err) {
@@ -119,7 +119,7 @@ module.exports = {
             dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
           }
 
-          let updateDataQuery = `UPDATE sys.products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
+          let updateDataQuery = `UPDATE products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
 
           db.query(updateDataQuery, (err, results) => {
             if (err) {

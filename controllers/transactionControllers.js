@@ -5,9 +5,11 @@ const { uploader } = require('../helper/uploader');
 const fs = require('fs');
 
 module.exports = {
-  // if asking for specific data
+  //  asking for a specific data
   getTransactionData: (req, res) => {
-    let getTransactionDataQuery = `SELECT * FROM sys.transaction WHERE transaction_id = ${req.params.transaction_id}`;
+    let getTransactionDataQuery = `SELECT * FROM transaction_details td 
+    INNER JOIN transactions t ON td.transaction_id = t.transaction_id
+    INNER JOIN users u ON t.user_id = u.id WHERE transactiondetail_id = ${req.params.transactiondetail_id}`;
 
     db.query(getTransactionDataQuery, (err, results) => {
       if (err) {
@@ -19,7 +21,9 @@ module.exports = {
   },
   // get all transaction data
   getAllTransactionData: (req, res) => {
-    let getAllTransactionDataQuery = `SELECT * FROM sys.transaction;`;
+    let getAllTransactionDataQuery = `SELECT * FROM transaction_details td 
+    INNER JOIN transactions t ON td.transaction_id = t.transaction_id
+    INNER JOIN users u ON t.user_id = u.id;`;
 
     db.query(getAllTransactionDataQuery, (err, results) => {
       if (err) {
@@ -49,7 +53,7 @@ module.exports = {
         let data = JSON.parse(req.body.data);
         data.product_img = filepath;
 
-        let addNewTransactionData = `INSERT INTO sys.transaction VALUES (null,
+        let addNewTransactionData = `INSERT INTO transaction_details VALUES (null,
         ${db.escape(data.product_name)}, ${db.escape(data.product_desc)}, 
         ${db.escape(filepath)}, ${db.escape(data.stock)}, 
         ${db.escape(data.netto)}, 
@@ -104,7 +108,9 @@ module.exports = {
             dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
           }
 
-          let updateTransactionDataQuery = `UPDATE sys.transaction SET ${dataUpdate} WHERE transaction_id = ${req.params.transaction_id};`;
+          let updateTransactionDataQuery = `UPDATE transaction_details td
+          INNER JOIN transactions t ON td.transaction_id = t.transaction_id
+          INNER JOIN users u ON t.user_id = u.id SET ${dataUpdate} WHERE transactiondetail_id = ${req.params.transactiondetail_id}`;
 
           db.query(updateTransactionDataQuery, (err, results) => {
             if (err) {
@@ -124,7 +130,9 @@ module.exports = {
             dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
           }
 
-          let updateTransactionDataQuery = `UPDATE sys.transaction SET ${dataUpdate} WHERE transaction_id = ${req.params.transaction_id};`;
+          let updateTransactionDataQuery = `UPDATE transaction_details td
+          INNER JOIN transactions t ON td.transaction_id = t.transaction_id
+          INNER JOIN users u ON t.user_id = u.id SET ${dataUpdate} WHERE transactiondetail_id = ${req.params.transactiondetail_id}`;
 
           db.query(updateTransactionDataQuery, (err, results) => {
             if (err) {
@@ -140,8 +148,9 @@ module.exports = {
       res.status(500).send(err);
     }
   },
+  // Delete Data
   deleteTransactionData: (req, res) => {
-    let deleteTransactionDataQuery = `DELETE FROM sys.transaction WHERE transaction_id = ${req.params.transaction_id}`;
+    let deleteTransactionDataQuery = `DELETE FROM transaction_details WHERE transactiondetail_id = ${req.params.transactiondetail_id}`;
 
     db.query(deleteTransactionDataQuery, (err, results) => {
       if (err) {
