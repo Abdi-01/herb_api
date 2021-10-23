@@ -7,7 +7,23 @@ module.exports = {
         td.product_name, 
         td.quantity, 
         t.total_price 
-        from transaction_details td join transactions t on t.transaction_id = td.transaction_id where t.payment_status = "paid" order by t.transaction_id;`
+        from transaction_details td 
+        join transactions t 
+        on t.transaction_id = td.transaction_id 
+        where t.payment_status = "paid" 
+        order by t.transaction_id;`
+        db.query(scriptQuery, (err, result)=>{
+            if(err) res.status(500).send(err)
+            res.status(200).send(result)
+        })
+    },
+    getRevenue: (req, res) => {
+        let scriptQuery = `select
+        sum(t.total_price) AS "Revenue"
+        from transaction_details td
+        join transactions t on t.transaction_id = td.transaction_id
+        where t.payment_status = "paid"
+        order by t.transaction_id;`
         db.query(scriptQuery, (err, result)=>{
             if(err) res.status(500).send(err)
             res.status(200).send(result)
