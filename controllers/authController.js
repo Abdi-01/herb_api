@@ -88,7 +88,7 @@ module.exports = {
           username
         )}, ${db.escape(email)},${db.escape(
           password
-        )},'user','unverified', null,null,null,null,null,null)`;
+        )},'user','unverified', null,null,null,null,null,null,null)`;
 
         // Post the DATA
 

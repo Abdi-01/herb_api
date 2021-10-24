@@ -45,7 +45,18 @@ module.exports = {
       res.sendStatus(200);
     });
   },
-  deleteCart: (req, res) => {
+  deleteSpecificCart: (req, res) => {
+    let { id } = req.params;
+    let deleteCartQuery = `delete from carts where id = ${db.escape(id)}`;
+
+    db.query(deleteCartQuery, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      res.sendStatus(200);
+    });
+  },
+  deleteCarts: (req, res) => {
     let { id } = req.params;
     let deleteCartQuery = `delete from carts where user_id = ${db.escape(id)}`;
 
