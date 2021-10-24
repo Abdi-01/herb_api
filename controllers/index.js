@@ -13,5 +13,6 @@ module.exports = {
   cartController,
   transactionController,
   userController,
-  adminController
+  adminController,
+  productControllers
 };

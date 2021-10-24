@@ -12,5 +12,7 @@ routers.post('/post', productControllers.addData);
 routers.patch('/update/:product_id', productControllers.updateData);
 // delete transaction
 routers.delete('/delete/:product_id', productControllers.deleteData);
+// get data record custom
+routers.get('/record', productControllers.getRecordData)
 
 module.exports = routers;

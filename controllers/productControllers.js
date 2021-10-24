@@ -5,9 +5,9 @@ const fs = require("fs");
 
 module.exports = {
   getData: (req, res) => {
-    let getDataQuery = `SELECT * FROM sys.products p
-      LEFT JOIN sys.brands b ON p.brand_id = b.brand_id
-      LEFT JOIN sys.categories c ON p.category_id = c.category_id WHERE product_id = ${req.params.product_id} `;
+    let getDataQuery = `SELECT * FROM products p
+      LEFT JOIN brands b ON p.brand_id = b.brand_id
+      LEFT JOIN categories c ON p.category_id = c.category_id WHERE product_id = ${req.params.product_id} `;
 
     db.query(getDataQuery, (err, results) => {
       if (err) {
@@ -18,30 +18,14 @@ module.exports = {
     });
   },
   getAllProductData: (req, res) => {
-    let { type } = req.query;
-    // console.log(req.query.type);
-
-    if (type === "custom") {
-      let sql = `select * from products where unit = "ml" or unit = "mg"`;
-      db.query(sql, (err, result1) => {
-        if (err) {
-          console.log(err);
-        }
-        let dataToString = JSON.stringify(result1);
-        let dataResult = JSON.parse(dataToString);
-        // console.log(dataResult);
-        res.status(200).send(dataResult);
-      });
-    } else {
-      let getAllProductsQuery = `SELECT * FROM sys.products p
-        LEFT JOIN sys.brands b ON p.brand_id = b.brand_id
-        LEFT JOIN sys.categories c ON p.category_id = c.category_id;`;
-      // checking
-      db.query(getAllProductsQuery, (err, results) => {
-        if (err) res.status(500).send(err);
-        res.status(200).send(results);
-      });
-    }
+    let getAllProductsQuery = `SELECT * FROM products p
+      LEFT JOIN brands b ON p.brand_id = b.brand_id
+      LEFT JOIN categories c ON p.category_id = c.category_id;`;
+    // checking
+    db.query(getAllProductsQuery, (err, results) => {
+      if (err) res.status(500).send(err);
+      res.status(200).send(results);
+    });
   },
   addData: (req, res) => {
     try {
@@ -61,18 +45,21 @@ module.exports = {
         //parsing the data
         let data = JSON.parse(req.body.data);
         data.product_img = filepath;
+        let netto_total = data.capacity_per_package * data.stock;
+        let price_per_unit = data.price_per_stock / data.capacity_per_package;
 
-        let addNewDataQuery = `INSERT INTO sys.products VALUES (null, ${db.escape(
-          data.product_name
-        )}, ${db.escape(data.product_desc)}, ${db.escape(
-          filepath
-        )}, ${db.escape(data.stock)}, ${db.escape(data.netto)}, ${db.escape(
-          data.netto_total
-        )}, ${db.escape(data.unit)}, ${db.escape(
-          data.price_per_unit
-        )}, ${db.escape(data.price_per_stock)}, ${db.escape(
-          data.brand_id
-        )}, ${db.escape(data.category_id)});`;
+        let addNewDataQuery = `INSERT INTO products VALUES (null, 
+          ${db.escape(data.product_name)}, 
+          ${db.escape(data.product_desc)}, 
+          ${db.escape(filepath)}, 
+          ${db.escape(data.stock)}, 
+          ${db.escape(data.capacity_per_package)}, 
+          ${db.escape(netto_total)},
+          ${db.escape(data.unit)}, 
+          ${db.escape(price_per_unit)}, 
+          ${db.escape(data.price_per_stock)}, 
+          ${db.escape(data.brand_id)}, 
+          ${db.escape(data.category_id)});`;
 
         db.query(addNewDataQuery, (err, results) => {
           if (err) {
@@ -115,7 +102,7 @@ module.exports = {
             dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
           }
 
-          let updateDataQuery = `UPDATE sys.products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
+          let updateDataQuery = `UPDATE products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
 
           db.query(updateDataQuery, (err, results) => {
             if (err) {
@@ -135,7 +122,7 @@ module.exports = {
             dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
           }
 
-          let updateDataQuery = `UPDATE sys.products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
+          let updateDataQuery = `UPDATE products SET ${dataUpdate} WHERE product_id = ${req.params.product_id};`;
 
           db.query(updateDataQuery, (err, results) => {
             if (err) {
@@ -152,10 +139,31 @@ module.exports = {
     }
   },
   deleteData: (req, res) => {
-    let deleteDataQuery = `DELETE FROM sys.products WHERE product_id = ${req.params.product_id}`;
+    let deleteDataQuery = `DELETE FROM products WHERE product_id = ${req.params.product_id}`;
 
     db.query(deleteDataQuery, (err, results) => {
       if (err) res.status(500).send(err);
+      res.status(200).send(results);
+    });
+  },
+  getRecordData: (req, res) => {
+    let getDataQuery = `SELECT 
+    DATE_FORMAT(t.transaction_date, "%e %M %Y") AS 'Date',
+    td.product_name,
+    td.quantity,
+    td.capacity_per_package,
+    td.unit,
+    t.total_price
+    from transaction_details td
+    join transactions t on t.transaction_id = td.transaction_id
+    where t.transaction_type = "custom"
+    order by t.transaction_id`;
+
+    db.query(getDataQuery, (err, results) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send(err);
+      }
       res.status(200).send(results);
     });
   },
