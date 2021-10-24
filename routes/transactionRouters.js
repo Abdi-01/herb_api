@@ -12,8 +12,9 @@ routers.get(
 );
 // get all data
 routers.get('/get', transactionControllers.getAllTransactionData);
-// add new transaction data
-routers.post('/post', transactionControllers.addNewTransactionData);
+
+// add new custom order transaction data
+// routers.post('/post', transactionControllers.addNewTransactionData);
 // update transaction data
 routers.patch(
   '/update/:transactiondetail_id',

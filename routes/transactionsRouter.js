@@ -6,11 +6,11 @@ const { authorize } = require('../helper/authToken');
 // Add Transaction
 router.post('/', transactionController.addTransaction);
 
+// add custom transaction
+router.post('/custom', transactionController.addCustomTransaction);
+
 // Get Transaction
 router.get('/', authorize, transactionController.getTransaction);
-
-// Get all Transaction (as admin)
-// router.get('/get', transactionController.getAllTransaction);
 
 // Get Transaction History
 router.get('/history', authorize, transactionController.getTransactionHistory);
