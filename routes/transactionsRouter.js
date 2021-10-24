@@ -10,13 +10,13 @@ router.post('/', transactionController.addTransaction);
 router.post('/custom', transactionController.addCustomTransaction);
 
 // Add Custom Transaction Detail Item
-router.post("/custom", transactionController.addTransactionDetailItem);
+router.post('/custom', transactionController.addTransactionDetailItem);
 
 // Get Transaction
 router.get('/', authorize, transactionController.getTransaction);
 
 // Get Transaction Detail
-router.get("/detail", transactionController.getTransDetail);
+router.get('/detail', transactionController.getTransDetail);
 
 // Get Transaction History
 router.get('/history', authorize, transactionController.getTransactionHistory);
@@ -24,12 +24,7 @@ router.get('/history', authorize, transactionController.getTransactionHistory);
 // Update transaction
 
 router.patch(
-  "/update/:transaction_id",
+  '/update/:transaction_id',
   transactionController.uploadPaymentProof
 );
-router.patch(
-  '/update/:transaction_id',
-  transactionController.updateTransactionProof
-);
-
 module.exports = router;
