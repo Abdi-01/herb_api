@@ -21,6 +21,7 @@ module.exports = {
     let getAllProductsQuery = `SELECT * FROM products p
       LEFT JOIN brands b ON p.brand_id = b.brand_id
       LEFT JOIN categories c ON p.category_id = c.category_id;`;
+
     // checking
     db.query(getAllProductsQuery, (err, results) => {
       if (err) res.status(500).send(err);
@@ -45,6 +46,7 @@ module.exports = {
         //parsing the data
         let data = JSON.parse(req.body.data);
         data.product_img = filepath;
+
         let netto_total = data.capacity_per_package * data.stock;
         let price_per_unit = data.price_per_stock / data.capacity_per_package;
 

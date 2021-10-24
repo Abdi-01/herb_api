@@ -1,21 +1,28 @@
-const { transactionControllers } = require("../controllers");
+const {
+  transactionControllers,
+  transactionController,
+} = require('../controllers');
 
-const routers = require("express").Router();
+const routers = require('express').Router();
 
 // get particular data
-routers.get("/get/:transaction_id", transactionControllers.getTransactionData);
+routers.get(
+  '/get/:transactiondetail_id',
+  transactionControllers.getTransactionData
+);
 // get all data
-routers.get("/get", transactionControllers.getAllTransactionData);
-// add new transaction data
-routers.post("/post", transactionControllers.addNewTransactionData);
+routers.get('/get', transactionControllers.getAllTransactionData);
+
+// add new custom order transaction data
+// routers.post('/post', transactionControllers.addNewTransactionData);
 // update transaction data
 routers.patch(
-  "/update/:transaction_id",
+  '/update/:transactiondetail_id',
   transactionControllers.updateTransactionData
 );
 // delete transaction data
 routers.delete(
-  "/delete/:transaction_id",
+  '/delete/:transactiondetail_id',
   transactionControllers.deleteTransactionData
 );
 

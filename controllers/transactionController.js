@@ -50,7 +50,53 @@ module.exports = {
       res.status(200).send(dataResult);
     });
   },
+  // add custom order transaction
+  addCustomTransaction: (req, res) => {
+    try {
+      let path = '/images/transaction';
+      // TRS for custom order image
+      const upload = uploader(path, 'TRS').fields([{ name: 'file' }]);
 
+      upload(req, res, (error) => {
+        if (error) {
+          console.log(error);
+          res.status(500).send(error);
+        }
+        // if isnt error
+        const { file } = req.files;
+        const filepath = file ? path + '/' + file[0].filename : null;
+
+        // parsing the data
+        let data = JSON.parse(req.body.data);
+        data.prescription_img = filepath;
+
+        let addNewTransactionData = `INSERT INTO transactions VALUES (null, ${db.escape(
+          data.userId
+        )},  ${db.escape(data.recipent)}, ${db.escape(
+          data.address
+        )}, null, "custom", ${db.escape(
+          data.transaction_date
+        )}, null, "unpaid", ${db.escape(filepath)}, ${db.escape(
+          data.notes
+        )}, null);`;
+
+        db.query(addNewTransactionData, (error, results) => {
+          if (error) {
+            console.log(error);
+            fs.unlinkSync('./public' + filepath);
+            res.status(500).send(error);
+          }
+          res.status(200).send({
+            message:
+              'Your query has succesfully been sent, please wait and check your notification for our reply!',
+          });
+        });
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error);
+    }
+  },
   addTransaction: (req, res) => {
     let { userId, recipent, address, totalPrice, transactionItems } = req.body;
 
@@ -158,6 +204,11 @@ module.exports = {
   uploadPaymentProof: (req, res) => {
     console.log(req.params.transaction_id);
     try {
+
+      let path = '/images/transaction';
+
+      const upload = uploader(path, 'TRF').fields([{ name: 'file' }]);
+
       let path = "/images/payment-proof";
       const upload = uploader(path, "PRF-").fields([{ name: "file" }]);
 
@@ -166,29 +217,51 @@ module.exports = {
           console.log(error);
           res.status(500).send(error);
         }
-        console.log(req.files);
-        const { file } = req.files;
-        const filePath = file ? path + "/" + file[0].filename : null;
-        // console.log(filePath);
 
-        let data = JSON.parse(req.body.data);
-        data.image = filePath;
+        if (req.files) {
+          const { file } = req.files;
+          const filepath = file ? path + '/' + file[0].filename : null;
 
-        let sql = `update transactions set notes_payment = ${db.escape(
-          data.notesPayment
-        )}, payment_status = "onprocess", payment_proof = ${db.escape(
-          filePath
-        )} where transaction_id = ${db.escape(req.params.transaction_id)}`;
+          let data = JSON.parse(req.body.data);
+          data.product_img = filepath;
 
-        db.query(sql, (err, result) => {
-          if (err) {
-            console.log(err);
-            fs.unlinkSync("./public" + filePath);
-            res.status(500).send(err);
+          let dataUpdate = [];
+
+          for (let prop in data) {
+            dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
           }
-          console.log(result);
-          res.status(200).send({ message: "upload file success" });
-        });
+
+          let updateTransactionDataQuery = `UPDATE transactions SET ${dataUpdate} WHERE transaction_id = ${req.params.transaction_id};`;
+
+          db.query(updateTransactionDataQuery, (err, results) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send(err);
+              fs.unlinkSync('./public' + filepath);
+            }
+            res
+              .status(200)
+              .send({ message: 'Item has succefully been updated' });
+          });
+        } else if (!req.files) {
+          let data = req.body;
+          let dataUpdate = [];
+
+          for (let prop in data) {
+            dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
+          }
+
+          let updateTransactionDataQuery = `UPDATE transactions SET ${dataUpdate} WHERE transaction_id = ${req.params.transaction_id};`;
+
+          db.query(updateTransactionDataQuery, (err, results) => {
+            if (err) {
+              console.log(err);
+              res.status(500).send(err);
+            }
+            res.status(200).send({ message: 'Succesfully updated item' });
+          });
+        }
+
       });
     } catch (error) {
       console.log(error);
