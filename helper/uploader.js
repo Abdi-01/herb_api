@@ -1,11 +1,11 @@
-const multer = require('multer');
+const multer = require("multer");
 // file/directory checking
-const fs = require('fs');
+const fs = require("fs");
 
 module.exports = {
   uploader: (directory, fileNamePrefix) => {
     //   defining where to store data image
-    let defaultDirectory = './public';
+    let defaultDirectory = "./public";
 
     // diskStorage: a function to store file from fe into public
     const storage = multer.diskStorage({
@@ -14,7 +14,7 @@ module.exports = {
 
         // condition: checking if the directory existed or not
         if (fs.existsSync(pathDirectory)) {
-          console.log('Directory is existed');
+          console.log("Directory is existed");
 
           cb(null, pathDirectory);
           // created new directory(mkdir) if the designated directory isnt existed
@@ -26,8 +26,8 @@ module.exports = {
       },
       // fileNaming
       filename: (req, file, cb) => {
-        let ext = file.originalname.split('.');
-        let filename = fileNamePrefix + Date.now() + '.' + ext[ext.length - 1];
+        let ext = file.originalname.split(".");
+        let filename = fileNamePrefix + Date.now() + "." + ext[ext.length - 1];
         cb(null, filename);
       },
     });
@@ -35,7 +35,7 @@ module.exports = {
     const fileFilter = (req, file, cb) => {
       const ext = /\.(jpg|jpeg|png|gif|pdf|txt|JPG|PNG|JPEG)/;
       if (!file.originalname.match(ext)) {
-        return cb(new Error('Your file type are denied'), false);
+        return cb(new Error("Your file type are denied"), false);
       }
       cb(null, true);
     };

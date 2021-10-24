@@ -17,9 +17,9 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-const { authRouters, cartRouters, transactionRouter } = require('./routes');
-const { productRouters } = require('./routes');
-const { transactionRouters } = require('./routes');
+const { authRouters, cartRouters, transactionRouter, userRouter, adminRouter } = require("./routes");
+const { productRouters } = require("./routes");
+const { transactionRouters } = require("./routes");
 
 app.use('/auth', authRouters);
 app.use('/products', productRouters);
@@ -29,4 +29,7 @@ app.use('/transaction', transactionRouters);
 // Regular Trans
 app.use('/transactions', transactionRouter);
 
-app.listen(PORT, () => console.log('Api Running :', PORT));
+app.use("/users", userRouter);
+app.use("/admin", adminRouter);
+
+app.listen(PORT, () => console.log("Api Running :", PORT));
