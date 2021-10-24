@@ -5,18 +5,35 @@ const fs = require("fs");
 module.exports = {
   getTransaction: (req, res) => {
     let { id } = req.session;
-    let getTransactionQuery = `select * from transactions where user_id = ${db.escape(
-      id
-    )} and payment_status = "unpaid" or payment_status = "onprocess" `;
+    let { type } = req.query;
+    // console.log(req.query.type);
 
-    db.query(getTransactionQuery, (err, result) => {
-      let dataToString = JSON.stringify(result);
-      let dataResult = JSON.parse(dataToString);
-      if (err) {
-        console.log(err);
-      }
-      res.status(200).send(dataResult);
-    });
+    if (type === "custom") {
+      // console.log("GET Custom Transactions");
+      let sql = `select * from transactions where transaction_type = "custom" and payment_status = "unpaid"`;
+      db.query(sql, (err, result1) => {
+        if (err) {
+          console.log(err);
+        }
+        let dataToString = JSON.stringify(result1);
+        let dataResult = JSON.parse(dataToString);
+        // console.log(dataResult);
+        res.status(200).send(dataResult);
+      });
+    } else {
+      let getTransactionQuery = `select * from transactions where user_id = ${db.escape(
+        id
+      )} and payment_status = "unpaid" and transaction_type = "normal" or payment_status = "onprocess" `;
+
+      db.query(getTransactionQuery, (err, result) => {
+        let dataToString = JSON.stringify(result);
+        let dataResult = JSON.parse(dataToString);
+        if (err) {
+          console.log(err);
+        }
+        res.status(200).send(dataResult);
+      });
+    }
   },
   getTransactionHistory: (req, res) => {
     let { id } = req.session;
@@ -54,10 +71,11 @@ module.exports = {
           result.insertId,
           item.product_id,
           item.quantity,
+          null,
           item.product_name,
           item.product_desc,
           item.product_img,
-          item.netto,
+          item.capacity_per_package,
           item.unit,
           item.price_per_unit,
           item.price_per_stock,
@@ -65,16 +83,59 @@ module.exports = {
           item.category_id,
         ]);
         let addTransDetail =
-          "INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, product_name, product_desc, product_img, netto, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?";
+          "INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?";
 
         // console.log(addTransDetail);
         db.query(addTransDetail, [values], (err2, res2) => {
           if (err2) {
             console.log(err2);
           }
-          console.log(res2);
+          // console.log(res2);
         });
       }
+    });
+  },
+
+  addTransactionDetailItem: (req, res) => {
+    let { dataDetail, transId, totalPayment } = req.body;
+    console.log(dataDetail);
+    console.log(transId);
+    console.log(totalPayment);
+
+    // Update status to onprocess
+    let sqlUpdate = `update transactions set payment_status = "onprocess", total_price = ${db.escape(
+      totalPayment
+    )}  where transaction_id = ${db.escape(transId)}`;
+    // console.log(sqlUpdate);
+
+    db.query(sqlUpdate, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      let values = dataDetail.map((item) => [
+        null,
+        transId,
+        item.product_id,
+        null,
+        item.dose,
+        item.product_name,
+        item.product_desc,
+        item.product_img,
+        item.capacity_per_package,
+        item.unit,
+        item.price_per_unit,
+        item.price_per_stock,
+        item.brand_id,
+        item.category_id,
+      ]);
+      let addTransDetail =
+        "INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?";
+      db.query(addTransDetail, [values], (err2, res2) => {
+        if (err2) {
+          console.log(err2);
+        }
+        // console.log(res2);
+      });
     });
   },
 

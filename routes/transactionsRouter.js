@@ -6,6 +6,9 @@ const { authorize } = require("../helper/authToken");
 // Add Transaction
 router.post("/", transactionController.addTransaction);
 
+// Add Custom Transaction Detail Item
+router.post("/custom", transactionController.addTransactionDetailItem);
+
 // Get Transaction
 router.get("/", authorize, transactionController.getTransaction);
 
