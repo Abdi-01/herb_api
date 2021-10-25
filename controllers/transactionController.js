@@ -1,6 +1,6 @@
-const { db } = require("../database/index");
-const { uploader } = require("../helper/uploader");
-const fs = require("fs");
+const { db } = require('../database/index');
+const { uploader } = require('../helper/uploader');
+const fs = require('fs');
 
 module.exports = {
   getTransaction: (req, res) => {
@@ -8,7 +8,7 @@ module.exports = {
     let { type } = req.query;
     // console.log(req.query.type);
 
-    if (type === "custom") {
+    if (type === 'custom') {
       // console.log("GET Custom Transactions");
       let sql = `select * from transactions where transaction_type = "custom" and payment_status = "unpaid"`;
       db.query(sql, (err, result1) => {
@@ -65,7 +65,7 @@ module.exports = {
         // if isnt error
         const { file } = req.files;
         const filepath = file ? path + '/' + file[0].filename : null;
-
+        console.log(req.files);
         // parsing the data
         let data = JSON.parse(req.body.data);
         data.prescription_img = filepath;
@@ -129,7 +129,7 @@ module.exports = {
           item.category_id,
         ]);
         let addTransDetail =
-          "INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?";
+          'INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?';
 
         // console.log(addTransDetail);
         db.query(addTransDetail, [values], (err2, res2) => {
@@ -175,7 +175,7 @@ module.exports = {
         item.category_id,
       ]);
       let addTransDetail =
-        "INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?";
+        'INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?';
       db.query(addTransDetail, [values], (err2, res2) => {
         if (err2) {
           console.log(err2);
@@ -257,7 +257,6 @@ module.exports = {
             res.status(200).send({ message: 'Succesfully updated item' });
           });
         }
-
       });
     } catch (error) {
       console.log(error);
