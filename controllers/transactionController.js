@@ -65,7 +65,7 @@ module.exports = {
         // if isnt error
         const { file } = req.files;
         const filepath = file ? path + '/' + file[0].filename : null;
-
+        console.log(req.files);
         // parsing the data
         let data = JSON.parse(req.body.data);
         data.prescription_img = filepath;
