@@ -14,5 +14,7 @@ routers.patch('/update/:product_id', productControllers.updateData);
 routers.delete('/delete/:product_id', productControllers.deleteData);
 // get data record custom
 routers.get('/record', productControllers.getRecordData)
+// edit data
+routers.patch('/restock/:product_id', productControllers.updateDataCustom)
 
 module.exports = routers;

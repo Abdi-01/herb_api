@@ -46,9 +46,7 @@ module.exports = {
         //parsing the data
         let data = JSON.parse(req.body.data);
         data.product_img = filepath;
-
-        let netto_total = data.capacity_per_package * data.stock;
-        let price_per_unit = data.price_per_stock / data.capacity_per_package;
+        let netto_total = data.capacity_per_package  * data.stock
 
         let addNewDataQuery = `INSERT INTO products VALUES (null, 
           ${db.escape(data.product_name)}, 
@@ -58,10 +56,11 @@ module.exports = {
           ${db.escape(data.capacity_per_package)}, 
           ${db.escape(netto_total)},
           ${db.escape(data.unit)}, 
-          ${db.escape(price_per_unit)}, 
+          ${db.escape(data.price_per_unit)}, 
           ${db.escape(data.price_per_stock)}, 
           ${db.escape(data.brand_id)}, 
-          ${db.escape(data.category_id)});`;
+          ${db.escape(data.category_id)},
+          null);`;
 
         db.query(addNewDataQuery, (err, results) => {
           if (err) {
@@ -167,6 +166,24 @@ module.exports = {
         res.status(500).send(err);
       }
       res.status(200).send(results);
+    });
+  },
+  updateDataCustom: (req, res) => {
+    let { stock, capacity_per_package, quantity, type } = req.body;
+    let netto_total = capacity_per_package  * stock;
+    stock = stock + quantity;
+
+    let updateDataQuery = `UPDATE products SET 
+      stock = ${db.escape(stock)},
+      netto_total = ${db.escape(netto_total)}
+      WHERE product_id = ${req.params.product_id};`    
+
+    db.query(updateDataQuery, (err, results) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send(err);
+      }
+      res.status(200).send({ message: 'Succesfully restock item', data: results });
     });
   },
 };
