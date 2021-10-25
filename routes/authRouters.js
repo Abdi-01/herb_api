@@ -6,7 +6,7 @@ const { authorize, auth } = require("../helper/authToken");
 const router = express.Router();
 
 // Login
-router.get("/login", authController.onLogin);
+router.post("/login", authController.onLogin);
 
 // Session
 router.get("/session", authorize, authController.getSession);

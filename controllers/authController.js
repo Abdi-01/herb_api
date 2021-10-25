@@ -6,7 +6,7 @@ const transporter = require("../helper/nodemailer");
 module.exports = {
   // loginUser : (user,password,res)
   onLogin: (req, res) => {
-    let { account, password } = req.query;
+    let { account, password } = req.body;
 
     // Hash the password
     password = Crypto.createHmac("sha1", "hash123")
@@ -223,7 +223,8 @@ module.exports = {
     });
   },
   changePassword: (req, res) => {
-    let { id, password } = req.body;
+    let { password, id } = req.body;
+    console.log(password, id);
 
     // Hash the password
     password = Crypto.createHmac("sha1", "hash123")
@@ -232,14 +233,14 @@ module.exports = {
 
     let updatePassword = `update users set password=${db.escape(
       password
-    )} where id = ${id}`;
+    )} where id = ${db.escape(id)}`;
 
     db.query(updatePassword, (err, results) => {
       if (err) {
         res.sendStatus(500);
       }
 
-      res.send(results);
+      res.send({ message: "Password successfuly changed" });
     });
   },
 };
