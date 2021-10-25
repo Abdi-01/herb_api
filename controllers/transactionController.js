@@ -1,6 +1,6 @@
-const { db } = require('../database/index');
-const { uploader } = require('../helper/uploader');
-const fs = require('fs');
+const { db } = require("../database/index");
+const { uploader } = require("../helper/uploader");
+const fs = require("fs");
 
 module.exports = {
   getTransaction: (req, res) => {
@@ -8,7 +8,7 @@ module.exports = {
     let { type } = req.query;
     // console.log(req.query.type);
 
-    if (type === 'custom') {
+    if (type === "custom") {
       // console.log("GET Custom Transactions");
       let sql = `select * from transactions where transaction_type = "custom" and payment_status = "unpaid"`;
       db.query(sql, (err, result1) => {
@@ -53,9 +53,9 @@ module.exports = {
   // add custom order transaction
   addCustomTransaction: (req, res) => {
     try {
-      let path = '/images/transaction';
+      let path = "/images/transaction";
       // TRS for custom order image
-      const upload = uploader(path, 'TRS').fields([{ name: 'file' }]);
+      const upload = uploader(path, "TRS").fields([{ name: "file" }]);
 
       upload(req, res, (error) => {
         if (error) {
@@ -64,7 +64,7 @@ module.exports = {
         }
         // if isnt error
         const { file } = req.files;
-        const filepath = file ? path + '/' + file[0].filename : null;
+        const filepath = file ? path + "/" + file[0].filename : null;
         console.log(req.files);
         // parsing the data
         let data = JSON.parse(req.body.data);
@@ -83,12 +83,12 @@ module.exports = {
         db.query(addNewTransactionData, (error, results) => {
           if (error) {
             console.log(error);
-            fs.unlinkSync('./public' + filepath);
+            fs.unlinkSync("./public" + filepath);
             res.status(500).send(error);
           }
           res.status(200).send({
             message:
-              'Your query has succesfully been sent, please wait and check your notification for our reply!',
+              "Your query has succesfully been sent, please wait and check your notification for our reply!",
           });
         });
       });
@@ -129,7 +129,7 @@ module.exports = {
           item.category_id,
         ]);
         let addTransDetail =
-          'INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?';
+          "INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?";
 
         // console.log(addTransDetail);
         db.query(addTransDetail, [values], (err2, res2) => {
@@ -175,7 +175,7 @@ module.exports = {
         item.category_id,
       ]);
       let addTransDetail =
-        'INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?';
+        "INSERT INTO transaction_details (transactiondetail_id, transaction_id, product_id, quantity, dose, product_name, product_desc, product_img, capacity_per_package, unit, price_per_unit, price_per_stock, brand_id, category_id) VALUES ?";
       db.query(addTransDetail, [values], (err2, res2) => {
         if (err2) {
           console.log(err2);
@@ -216,7 +216,7 @@ module.exports = {
 
         if (req.files) {
           const { file } = req.files;
-          const filepath = file ? path + '/' + file[0].filename : null;
+          const filepath = file ? path + "/" + file[0].filename : null;
 
           let data = JSON.parse(req.body.data);
           data.product_img = filepath;
@@ -233,11 +233,11 @@ module.exports = {
             if (err) {
               console.log(err);
               res.status(500).send(err);
-              fs.unlinkSync('./public' + filepath);
+              fs.unlinkSync("./public" + filepath);
             }
             res
               .status(200)
-              .send({ message: 'Item has succefully been updated' });
+              .send({ message: "Item has succefully been updated" });
           });
         } else if (!req.files) {
           let data = req.body;
@@ -254,7 +254,7 @@ module.exports = {
               console.log(err);
               res.status(500).send(err);
             }
-            res.status(200).send({ message: 'Succesfully updated item' });
+            res.status(200).send({ message: "Succesfully updated item" });
           });
         }
       });
