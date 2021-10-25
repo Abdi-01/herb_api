@@ -1,8 +1,8 @@
 const { userController } = require('../controllers')
 const routers = require('express').Router();
 
-routers.get('/', userController.getData) //Get All Data
-routers.get('/:id', userController.getDataById) //Get Data By Id
-routers.patch('/:id', userController.editData); //Edit Data
+routers.get('/', userController.getData)
+routers.get('/:id', userController.getDataById)
+routers.patch('/:id', userController.editData);
 
 module.exports = routers

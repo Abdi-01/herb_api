@@ -204,6 +204,7 @@ module.exports = {
   uploadPaymentProof: (req, res) => {
     console.log(req.params.transaction_id);
     try {
+
       let path = "/images/payment-proof";
       const upload = uploader(path, "PRF-").fields([{ name: "file" }]);
 
