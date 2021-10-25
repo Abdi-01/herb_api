@@ -10,7 +10,7 @@ module.exports = {
         from transaction_details td 
         join transactions t 
         on t.transaction_id = td.transaction_id 
-        where t.payment_status = "paid" 
+        where t.payment_status = "paid" && t.transaction_type = "normal"
         order by t.transaction_id;`
         db.query(scriptQuery, (err, result)=>{
             if(err) res.status(500).send(err)
@@ -22,7 +22,7 @@ module.exports = {
         sum(t.total_price) AS "Revenue"
         from transaction_details td
         join transactions t on t.transaction_id = td.transaction_id
-        where t.payment_status = "paid"
+        where t.payment_status = "paid" && t.transaction_type = "normal"
         order by t.transaction_id;`
         db.query(scriptQuery, (err, result)=>{
             if(err) res.status(500).send(err)

@@ -143,7 +143,7 @@ module.exports = {
     let getDataQuery = `SELECT 
     DATE_FORMAT(t.transaction_date, "%e %M %Y") AS 'Date',
     td.product_name,
-    td.quantity,
+    td.dose,
     td.capacity_per_package,
     td.unit,
     t.total_price
