@@ -205,10 +205,6 @@ module.exports = {
     console.log(req.params.transaction_id);
     try {
 
-      let path = '/images/transaction';
-
-      const upload = uploader(path, 'TRF').fields([{ name: 'file' }]);
-
       let path = "/images/payment-proof";
       const upload = uploader(path, "PRF-").fields([{ name: "file" }]);
 

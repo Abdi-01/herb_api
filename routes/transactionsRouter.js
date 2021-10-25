@@ -22,14 +22,9 @@ router.get("/detail", transactionController.getTransDetail);
 router.get('/history', authorize, transactionController.getTransactionHistory);
 
 // Update transaction
-
 router.patch(
   "/update/:transaction_id",
   transactionController.uploadPaymentProof
-);
-router.patch(
-  '/update/:transaction_id',
-  transactionController.updateTransactionProof
 );
 
 module.exports = router;
