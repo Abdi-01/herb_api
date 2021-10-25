@@ -212,50 +212,29 @@ module.exports = {
           console.log(error);
           res.status(500).send(error);
         }
+        console.log(req.files);
+        const { file } = req.files;
+        const filePath = file ? path + "/" + file[0].filename : null;
+        // console.log(filePath);
 
-        if (req.files) {
-          const { file } = req.files;
-          const filepath = file ? path + "/" + file[0].filename : null;
+        let data = JSON.parse(req.body.data);
+        data.image = filePath;
 
-          let data = JSON.parse(req.body.data);
-          data.product_img = filepath;
+        let sql = `update transactions set notes_payment = ${db.escape(
+          data.notesPayment
+        )}, payment_status = "onprocess", payment_proof = ${db.escape(
+          filePath
+        )} where transaction_id = ${db.escape(req.params.transaction_id)}`;
 
-          let dataUpdate = [];
-
-          for (let prop in data) {
-            dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
+        db.query(sql, (err, result) => {
+          if (err) {
+            console.log(err);
+            fs.unlinkSync("./public" + filePath);
+            res.status(500).send(err);
           }
-
-          let updateTransactionDataQuery = `UPDATE transactions SET ${dataUpdate} WHERE transaction_id = ${req.params.transaction_id};`;
-
-          db.query(updateTransactionDataQuery, (err, results) => {
-            if (err) {
-              console.log(err);
-              res.status(500).send(err);
-              fs.unlinkSync("./public" + filepath);
-            }
-            res
-              .status(200)
-              .send({ message: "Item has succefully been updated" });
-          });
-        } else if (!req.files) {
-          let data = req.body;
-          let dataUpdate = [];
-
-          for (let prop in data) {
-            dataUpdate.push(`${prop} = ${db.escape(data[prop])}`);
-          }
-
-          let updateTransactionDataQuery = `UPDATE transactions SET ${dataUpdate} WHERE transaction_id = ${req.params.transaction_id};`;
-
-          db.query(updateTransactionDataQuery, (err, results) => {
-            if (err) {
-              console.log(err);
-              res.status(500).send(err);
-            }
-            res.status(200).send({ message: "Succesfully updated item" });
-          });
-        }
+          console.log(result);
+          res.status(200).send({ message: "upload file success" });
+        });
       });
     } catch (error) {
       console.log(error);
