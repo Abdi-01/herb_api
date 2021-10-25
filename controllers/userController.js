@@ -12,7 +12,6 @@ module.exports = {
     },
     getDataById: (req, res) => {
         scriptQuery = `select * from users where id = ${req.params.id};`
-        console.log(scriptQuery)
         db.query(scriptQuery, (err, results) => {
             if (err) res.status(500).send(err)
             res.status(200).send(results)   
@@ -25,10 +24,8 @@ module.exports = {
 
             upload(req, res, (error) => {
                 if (error) {
-                    console.log(error)
                     res.status(500).send(error)
                 }
-                console.log(req.files)
                 if (req.files) {
                 const { img_profile } = req.files
                 const filepath = img_profile ? path + '/' + img_profile[0].filename : null
@@ -43,11 +40,9 @@ module.exports = {
                 }
 
                 let updateDataQuery = `UPDATE users SET ${dataUpdate} WHERE id = ${req.params.id};`;
-                console.log(updateDataQuery);
 
                 db.query(updateDataQuery, (err, results) => {
                     if (err) {
-                        console.log(err);
                         res.status(500).send(err);
                         fs.unlinkSync("./public" + filepath);
                     }
@@ -67,7 +62,6 @@ module.exports = {
 
                     db.query(updateDataQuery, (err, results) => {
                         if (err) {
-                            console.log(err);
                             fs.unlinkSync("./public" + filepath);
                             res.status(500).send(err);
                         }
@@ -76,7 +70,6 @@ module.exports = {
                 }
             });
         } catch (error) {
-            console.log(error);
             res.status(500).send(error);
         }
     }

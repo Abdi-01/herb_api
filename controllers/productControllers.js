@@ -11,7 +11,6 @@ module.exports = {
 
     db.query(getDataQuery, (err, results) => {
       if (err) {
-        console.log(err);
         res.status(500).send(err);
       }
       res.status(200).send(results);
@@ -36,10 +35,8 @@ module.exports = {
       upload(req, res, (error) => {
         // if error
         if (error) {
-          console.log(error);
           res.status(500).send(error);
         }
-        // console.log(req.files);
         const { file } = req.files;
         const filepath = file ? path + '/' + file[0].filename : null;
 
@@ -73,7 +70,6 @@ module.exports = {
         });
       });
     } catch (error) {
-      console.log(error);
       res.status(500).send(error);
     }
   },
@@ -85,7 +81,7 @@ module.exports = {
       upload(req, res, (error) => {
         // if error
         if (error) {
-          console.log(error);
+  
           res.status(500).send(error);
         }
 
@@ -106,7 +102,6 @@ module.exports = {
 
           db.query(updateDataQuery, (err, results) => {
             if (err) {
-              console.log(err);
               res.status(500).send(err);
               fs.unlinkSync('./public' + filepath);
             }
@@ -126,7 +121,6 @@ module.exports = {
 
           db.query(updateDataQuery, (err, results) => {
             if (err) {
-              console.log(err);
               res.status(500).send(err);
             }
             res.status(200).send({ message: 'Succesfully updated item' });
@@ -134,7 +128,6 @@ module.exports = {
         }
       });
     } catch (error) {
-      console.log(error);
       res.status(500).send(err);
     }
   },
@@ -161,14 +154,13 @@ module.exports = {
 
     db.query(getDataQuery, (err, results) => {
       if (err) {
-        console.log(err);
         res.status(500).send(err);
       }
       res.status(200).send(results);
     });
   },
   updateDataCustom: (req, res) => {
-    let { stock, capacity_per_package, quantity, type } = req.body;
+    let { stock, capacity_per_package, quantity } = req.body;
     let netto_total = capacity_per_package  * stock;
     stock = stock + quantity;
 
@@ -179,7 +171,6 @@ module.exports = {
 
     db.query(updateDataQuery, (err, results) => {
       if (err) {
-        console.log(err);
         res.status(500).send(err);
       }
       res.status(200).send({ message: 'Succesfully restock item', data: results });
